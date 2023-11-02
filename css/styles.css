@@ -68,8 +68,16 @@ body {
   
 /* Otros estilos */
 
+span {
+    color: red;
+}
+
 .chatonline-svg-white {
     filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(19deg) brightness(103%) contrast(101%);
+}
+
+.chatonline-svg-gray {
+    filter: brightness(0) saturate(100%) invert(20%) sepia(5%) saturate(0%) hue-rotate(141deg) brightness(105%) contrast(80%);
 }
 
 .chatonline-form-bg {
@@ -180,11 +188,14 @@ background-color: #202020;
 }
 
 .chatonline-contacts {
+    min-width: 400px;
+    min-height: 80vh;
     background-color: #272727;
     color: white;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
     padding: 1.5% 2%;
+    box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.5);
 }
 
 .chatonline-contacts-title {
@@ -192,6 +203,10 @@ background-color: #202020;
     font-weight: bold;
 }
 
+.chatonline-contacts-contact {
+    margin-bottom: 1%;
+    border-radius: 10px;
+}
 .chatonline-contacts-contact-icon {
     height: auto;
     width: 100%;
@@ -200,11 +215,6 @@ background-color: #202020;
 .chatonline-contacts-contacts {
     margin-top: 2%;
     margin-left: 2%;
-}
-
-.chatonline-contacts-contact {
-    margin-bottom: 1%;
-    border-radius: 10px;
 }
 
 .chatonline-contacts-contact:hover {
@@ -264,9 +274,40 @@ background-color: #202020;
 }
 
 .chatonline-chat {
+    float: left;
     margin-left: 2px;
     background-color: #272727;
     color: white;
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
+    box-shadow: 10px 15px 30px rgba(0, 0, 0, 0.5);
 }
+
+.chatonline-chat-nochat {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    text-align: center;
+    color: gray;
+}
+
+.chatonline-chat-nochat h2 {
+    font-weight: lighter;
+    color: white;
+}
+
+.chatonline-chat-nochat-img-logo {
+    height: 100%;
+    width: 10%;
+}
+
+@media screen and (max-width: 800px) {
+    /* Add your styles here */
+    .chatonline-contacts-contact-hide-column {
+        display: none;
+    }
+    .chatonline-contacts {
+        min-width: 0;
+    }
+  }

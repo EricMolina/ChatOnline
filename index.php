@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prueba de Cuadrícula</title>
-    <link rel="stylesheet" href="./css/styles.css"> <!-- Asegúrate de enlazar tu archivo CSS aquí -->
+    <title>PATACHAT</title>
+    <link rel="icon" type="image/x-icon" href="./img/icon.ico">
+    <link rel="stylesheet" href="./css/styles.css">
+    <script src="./js/functions.js"></script>
 </head>
 <body class="chatonline-index-bg">
     <div class="container">
@@ -33,14 +35,14 @@
                     <div class="row chatonline-contacts-contacts">
                         <div class="column column-1 chatonline-contacts-contact">
                             <div class="row">
-                                <div class="column column-30">
+                                <div class="column column-30 chatonline-contacts-contact-hide-column">
                                     <img src="./img/user.png" alt="logo" class="chatonline-contacts-contact-icon chatonline-svg-white">
                                 </div>
                                 <div class="column column-60">
                                     <h1>username</h1>
                                     <p>last message</p>
                                 </div>
-                                <div class="column column-10">
+                                <div class="column column-10 chatonline-contacts-contact-hide-column">
                                     <h2>15:05</h2>
                                 </div>
                             </div>
@@ -48,28 +50,28 @@
 
                         <div class="column column-1 chatonline-contacts-contact">
                             <div class="row">
-                                <div class="column column-30">
+                                <div class="column column-30 chatonline-contacts-contact-hide-column">
                                     <img src="./img/user.png" alt="logo" class="chatonline-contacts-contact-icon chatonline-svg-white">
                                 </div>
                                 <div class="column column-60">
                                     <h1>username</h1>
                                     <p>last message</p>
                                 </div>
-                                <div class="column column-10">
+                                <div class="column column-10 chatonline-contacts-contact-hide-column">
                                     <h2>15:05</h2>
                                 </div>
                             </div>
                         </div>
                         <div class="column column-1 chatonline-contacts-contact">
                             <div class="row">
-                                <div class="column column-30">
+                                <div class="column column-30 chatonline-contacts-contact-hide-column">
                                     <img src="./img/user.png" alt="logo" class="chatonline-contacts-contact-icon chatonline-svg-white">
                                 </div>
                                 <div class="column column-60">
                                     <h1>username</h1>
                                     <p>last message</p>
                                 </div>
-                                <div class="column column-10">
+                                <div class="column column-10 chatonline-contacts-contact-hide-column">
                                     <h2>15:05</h2>
                                 </div>
                             </div>
@@ -77,8 +79,14 @@
                     </div>
                 </div>
             </div>
-            <div class="column column-70 chatonline-chat">
-                <p>chat</p>
+            <div class="column chatonline-chat">
+                <div class="chatonline-chat-nochat">
+                    <div>
+                        <img src="./img/logo.svg" class="chatonline-chat-nochat-img-logo chatonline-svg-gray">
+                        <h2>PATACHAT for Web</h2>
+                        <p>Send and get messages</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
