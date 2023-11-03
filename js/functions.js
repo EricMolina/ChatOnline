@@ -1,3 +1,30 @@
+var urlWindow = "_";
+var urlContact = "_";
+document.addEventListener("DOMContentLoaded", function(event) { 
+    urlParams = new URLSearchParams(window.location.search);
+    var selectedOption = null;
+    if (document.getElementsByClassName("chatonline-contacts-toggler-div-contacts") != null) {
+        if (urlParams.get("window") != null) {
+            urlWindow = urlParams.get("window");
+            if (urlWindow == "requests") {
+                selectedOption = document.getElementsByClassName("chatonline-contacts-toggler-div-requests")[0];
+            }
+            else {
+                selectedOption = document.getElementsByClassName("chatonline-contacts-toggler-div-contacts")[0];
+            }
+        }
+        selectedOption.style.backgroundColor = '#777777';
+    }
+}); //FALTA HACER EL urlContact - FALTA HACER EL urlContact - FALTA HACER EL urlContact
+
+function ChangeToggler(page, data) {
+    window.location.href = page + "?window=" + data + "&contact=" + urlContact;
+}
+
+function ChangeContact(page, data) {
+    window.location.href = page + "?window=" + data + "&contact=" + urlContact;
+}
+
 function ValidateLogin() {
     var final = true;
     if (!CheckText("username"))

@@ -26,10 +26,10 @@
                             </div>
                             <div class="column column-2">
                                 <div class="row chatonline-contacts-toggler">
-                                    <div onclick="window.location.href = 'index.php';" class="column column-2 chatonline-contacts-toggler-div-contacts">
+                                    <div onclick="ChangeToggler('chat.php','contacts')" class="column column-2 chatonline-contacts-toggler-div-contacts">
                                     <img src="./img/contacts.svg" class="chatonline-contacts-toggler-icon chatonline-svg-white"/>
                                     </div>
-                                    <div onclick="window.location.href = 'index.php?window=requests';" class="column column-2 chatonline-contacts-toggler-div-requests">
+                                    <div onclick="ChangeToggler('chat.php','requests');" class="column column-2 chatonline-contacts-toggler-div-requests">
                                     <img src="./img/request.svg" class="chatonline-contacts-toggler-icon chatonline-svg-white"/>
                                     </div>
                                 </div>
@@ -43,7 +43,7 @@
                         </form>
                     </div>
                     <div class="row chatonline-contacts-contacts">
-                        <div onclick="window.location.href = './chat.php?contact=1';" class="column column-1 chatonline-contacts-contact">
+                        <div class="column column-1 chatonline-contacts-contact">
                             <div class="row">
                                 <div class="column column-30 chatonline-contacts-contact-hide-column">
                                     <img src="./img/user.png" alt="logo" class="chatonline-contacts-contact-icon chatonline-svg-white">
@@ -58,7 +58,7 @@
                             </div>
                         </div>
 
-                        <div onclick="window.location.href = './chat.php?contact=1';" class="column column-1 chatonline-contacts-contact">
+                        <div class="column column-1 chatonline-contacts-contact">
                             <div class="row">
                                 <div class="column column-30 chatonline-contacts-contact-hide-column">
                                     <img src="./img/user.png" alt="logo" class="chatonline-contacts-contact-icon chatonline-svg-white">
@@ -72,7 +72,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div onclick="window.location.href = './chat.php?contact=1';" class="column column-1 chatonline-contacts-contact">
+                        <div class="column column-1 chatonline-contacts-contact">
                             <div class="row">
                                 <div class="column column-30 chatonline-contacts-contact-hide-column">
                                     <img src="./img/user.png" alt="logo" class="chatonline-contacts-contact-icon chatonline-svg-white">
@@ -90,11 +90,15 @@
                 </div>
             </div>
             <div class="column chatonline-chat">
-                <div class="chatonline-chat-nochat">
-                    <div>
-                        <img src="./img/logo.svg" class="chatonline-chat-nochat-img-logo chatonline-svg-gray">
-                        <h2>PATACHAT for Web</h2>
-                        <p>Send and get messages with your friends!</p>
+                <div class="row">
+                    <div class="column column-1">
+
+                    </div>
+                    <div class="column column-1">
+                        
+                    </div>
+                    <div class="column column-1">
+                        
                     </div>
                 </div>
             </div>
