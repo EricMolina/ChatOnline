@@ -9,6 +9,12 @@
     <link rel="stylesheet" href="../css/styles.css">
     <script src="../js/functions.js"></script>
 </head>
+    <?php
+    //BORRAR ESTO LUEGO
+    /*session_start();
+    $_SESSION["is_logged"] = true;
+    header("location: ../index.php");*/
+    ?>
 <body class="chatonline-form-bg">
 
 <div class="chatonline-top-green-div">

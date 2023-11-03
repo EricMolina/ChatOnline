@@ -1,28 +1,35 @@
-var urlWindow = "_";
-var urlContact = "_";
+var urlWindow = "contacts";
 document.addEventListener("DOMContentLoaded", function(event) { 
     urlParams = new URLSearchParams(window.location.search);
     var selectedOption = null;
-    if (document.getElementsByClassName("chatonline-contacts-toggler-div-contacts") != null) {
+    if (document.getElementsByClassName("chatonline-contacts-toggler-div-contacts") != null) { //we are on index.php
+        selectedOption = document.getElementsByClassName("chatonline-contacts-toggler-div-contacts")[0];
         if (urlParams.get("window") != null) {
             urlWindow = urlParams.get("window");
             if (urlWindow == "requests") {
                 selectedOption = document.getElementsByClassName("chatonline-contacts-toggler-div-requests")[0];
             }
-            else {
-                selectedOption = document.getElementsByClassName("chatonline-contacts-toggler-div-contacts")[0];
-            }
         }
         selectedOption.style.backgroundColor = '#777777';
-    }
-}); //FALTA HACER EL urlContact - FALTA HACER EL urlContact - FALTA HACER EL urlContact
+        selectedOption.style.boxShadow = "inset 0px 0px 10px rgba(0, 0, 0, 0.5)";
 
-function ChangeToggler(page, data) {
-    window.location.href = page + "?window=" + data + "&contact=" + urlContact;
+        if (document.getElementById("contact_id") != null) {
+            document.getElementsByClassName("chatonline-chat-chat")[0].style.display = "flex";
+            document.getElementsByClassName("chatonline-chat-nochat")[0].style.display = "none";
+        } else {
+            document.getElementsByClassName("chatonline-chat-chat")[0].style.display = "none";
+            document.getElementsByClassName("chatonline-chat-nochat")[0].style.display = "flex";
+        }
+    }
+});
+
+function ChangeToggler(data) {
+    window.location.href = 'index.php' + "?window=" + data;
 }
 
-function ChangeContact(page, data) {
-    window.location.href = page + "?window=" + data + "&contact=" + urlContact;
+function ChangeContact(id) {
+    document.getElementById("contact_field").value = id;
+    document.getElementById('form_contact_field').submit();
 }
 
 function ValidateLogin() {
