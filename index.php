@@ -11,12 +11,9 @@ $logged_user = get_user_logedin();
 $logged_user_id = mysqli_escape_string($conn, $logged_user["id"]);
 
 
-
 if (isset($_GET['searched_user'])) {
 
     // Search user
-
-    echo "---- BUSQUEDA USUARIOS ----<br>";
 
     $searched_user = "%".mysqli_escape_string($conn, $_GET['searched_user'])."%";
 
@@ -48,27 +45,11 @@ if (isset($_GET['searched_user'])) {
 
     mysqli_stmt_close($stmt_filter_users);
 
-    foreach ($filtered_users as $user) {
-        echo "<br>";
-        echo "Username: " .$user['username']. " | ";
-        if ($user['is_friend']) {
-            echo "Ya es tu amigo";
-            continue;
-        }
-        if ($user['has_request']) {
-            echo "Petición enviada";
-            continue;
-        }
-        echo "<a href='./proc/send_friend_request.php?id_user=".$user['id'].
-             "&searched_user=".$_GET['searched_user']."'>Enviar petición</a>";
-    }
 
 } else if (isset($_GET['window']) && $_GET['window'] == 'requests') {
     
     // Recived friend request
-    
-    echo "---- SOLICITUDES DE AMISTAD ----<br>";
-        
+            
     $query_get_friend_requests = "SELECT user.username as 'user_sender', friend_request.id as 'request_id'
                                  FROM friend_request
                                  INNER JOIN user ON friend_request.id_user_sender = user.id
@@ -88,19 +69,13 @@ if (isset($_GET['searched_user'])) {
     
     mysqli_stmt_close($stmt_get_friend_requests);
     
-    foreach ($friend_requests as $request) {
-        echo "Petición de ".$request['user_sender'].": ";
-        echo "<a href='./proc/respond_friend_request.php?response=accept&request_id=".$request['request_id']."'>Acpetar petición</a> | ";
-        echo "<a href='./proc/respond_friend_request.php?response=reject&request_id=".$request['request_id']."'>Rechazar petición</a>";
-    }    
 
 } else {
 
     // User friends
 
-    echo "<br><br>---- CONTACTOS ----<br>";
-
-    $query_get_friend_ships = "SELECT IF(user1.id = ?, user2.username, user1.username) as 'friend_ship_username'
+    $query_get_friend_ships = "SELECT IF(user1.id = ?, user2.username, user1.username) as 'friend_ship_username',
+                               IF(user1.id = ?, user2.id, user1.id)  as 'friend_ship_user_id'
                                FROM friend_ship
                                INNER JOIN user user1 ON user1.id = friend_ship.id_user1
                                INNER JOIN user user2 ON user2.id = friend_ship.id_user2
@@ -110,7 +85,8 @@ if (isset($_GET['searched_user'])) {
     mysqli_stmt_prepare($stmt_get_friend_ships, $query_get_friend_ships);
     mysqli_stmt_bind_param(
     $stmt_get_friend_ships,
-        "iii",
+        "iiii",
+        $logged_user_id,
         $logged_user_id,
         $logged_user_id,
         $logged_user_id
@@ -121,15 +97,10 @@ if (isset($_GET['searched_user'])) {
     $friend_ships = mysqli_fetch_all($friend_ships_result, MYSQLI_ASSOC);
 
     mysqli_stmt_close($stmt_get_friend_ships);
-
-    echo "<ul>";
-    foreach ($friend_ships as $friend_ship) {
-        echo "<li>".$friend_ship['friend_ship_username']."</li>";
-    }
-    echo "</ul>";
-
 } 
 ?>
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -141,31 +112,18 @@ if (isset($_GET['searched_user'])) {
     <script src="./js/functions.js"></script>
 </head>
 <?php
-    session_start();
-    if (!isset($_SESSION["is_logged"]) || $_SESSION["is_logged"] == false) {
-        session_abort();
-        session_destroy();
-        header("location: ./view/login.php");
-        exit();
-    } else { 
-        //all mysql code
+    //all mysql code
 
-        if (!isset($_POST["contact"]) || $_POST["contact"] == "") {
-            $_SESSION["contact"] = "null";
-        } else {
-            $_SESSION["contact"] = $_POST["contact"];
-            echo '<input type="hidden" id="contact_id">'; //needed for js things
+    if (!isset($_POST["contact"]) || $_POST["contact"] == "") {
+        $_SESSION["contact"] = "null";
+    } else {
+        $_SESSION["contact"] = $_POST["contact"];
+        echo '<input type="hidden" id="contact_id">'; //needed for js things
 
-            //on chat, read all chat
-        }
-
-        if (isset($_POST["searched_msg"]) && $_POST["searched_msg"] != "") {
-            //echo "<script>console.log('".($_POST["searched_msg"])."');</script>";
-
-            //find searched messages with mysql
-        }
+        //on chat, read all chat
     }
-    ?>
+
+?>
 <body class="chatonline-index-bg">
     <div class="container">
         <div class="row">
@@ -208,49 +166,88 @@ if (isset($_GET['searched_user'])) {
                         <form id="form_contact_field" action="./index.php" method="POST">
                             <input type="hidden" name="contact" id="contact_field" value="">
                         </form>
-                        <div onclick="ChangeContact(1)" class="column column-1 chatonline-contacts-contact">
-                            <div class="row">
-                                <div class="column column-30 chatonline-contacts-contact-hide-column">
-                                    <img src="./img/user.png" alt="logo" class="chatonline-contacts-contact-icon chatonline-svg-white">
-                                </div>
-                                <div class="column column-60">
-                                    <h1>[USERNAME]</h1>
-                                    <p>[LAST MSG]</p>
-                                </div>
-                                <div class="column column-10 chatonline-contacts-contact-hide-column">
-                                    <h2>15:05</h2>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div onclick="ChangeContact(2)" class="column column-1 chatonline-contacts-contact">
-                            <div class="row">
-                                <div class="column column-30 chatonline-contacts-contact-hide-column">
-                                    <img src="./img/user.png" alt="logo" class="chatonline-contacts-contact-icon chatonline-svg-white">
+                        <?php
+
+                        if (isset($_GET['searched_user'])) {
+
+                            // Search user list
+
+                            foreach ($filtered_users as $user) {
+                                ?>
+                                <div class="column column-1 chatonline-contacts-contact">
+                                    <div class="row">
+                                        <div class="column column-30 chatonline-contacts-contact-hide-column">
+                                            <img src="./img/user.png" alt="logo" class="chatonline-contacts-contact-icon chatonline-svg-white">
+                                        </div>
+                                        <div class="column column-60">
+                                            <h1><?php echo $user['username']; ?></h1>
+                                            <?php
+                                            if ($user['is_friend']) {
+                                                echo "Ya es tu amigo";
+                                            } else if  ($user['has_request']) {
+                                                echo "Petición enviada";
+                                            } else {
+                                                echo "<a href='./proc/send_friend_request.php?id_user=".$user['id'].
+                                                "&searched_user=".$_GET['searched_user']."'>Enviar petición</a>";
+                                            }
+                                            ?>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="column column-60">
-                                    <h1>[USERNAME]</h1>
-                                    <p>[LAST MSG]</p>
+                                <?php
+                                
+                            }
+
+                        } else if (!isset($_GET['window']) || $_GET['window'] != 'requests') {
+
+                            // User friend ships list
+
+                            foreach ($friend_ships as $friend_ship) {
+                                ?>
+                                <div onclick="ChangeContact(<?php echo $friend_ship['friend_ship_user_id']; ?>)" class="column column-1 chatonline-contacts-contact">
+                                    <div class="row">
+                                        <div class="column column-30 chatonline-contacts-contact-hide-column">
+                                            <img src="./img/user.png" alt="logo" class="chatonline-contacts-contact-icon chatonline-svg-white">
+                                        </div>
+                                        <div class="column column-60">
+                                            <h1><?php echo $friend_ship['friend_ship_username']; ?></h1>
+                                            <p>[LAST MSG]</p>
+                                        </div>
+                                        <div class="column column-10 chatonline-contacts-contact-hide-column">
+                                            <h2>15:05</h2>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="column column-10 chatonline-contacts-contact-hide-column">
-                                    <h2>15:05</h2>
+                                <?php
+                            }
+
+                        } else {
+
+                            // User friend request list
+
+                            foreach ($friend_requests as $request) {
+                                ?>
+
+                                <div class="column column-1 chatonline-contacts-contact">
+                                    <div class="row">
+                                        <div class="column column-30 chatonline-contacts-contact-hide-column">
+                                            <img src="./img/user.png" alt="logo" class="chatonline-contacts-contact-icon chatonline-svg-white">
+                                        </div>
+                                        <div class="column column-60">
+                                            <h1><?php echo $request['user_sender']; ?></h1>
+                                            <p><a href='./proc/respond_friend_request.php?response=accept&request_id="<?php echo $request['request_id']; ?>"'>Acpetar petición</a></p>
+                                            <p><a href='./proc/respond_friend_request.php?response=reject&request_id="<?php echo $request['request_id']; ?>"'>Rechazar petición</a></p>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div onclick="ChangeContact(3)" class="column column-1 chatonline-contacts-contact">
-                            <div class="row">
-                                <div class="column column-30 chatonline-contacts-contact-hide-column">
-                                    <img src="./img/user.png" alt="logo" class="chatonline-contacts-contact-icon chatonline-svg-white">
-                                </div>
-                                <div class="column column-60">
-                                    <h1>[USERNAME]</h1>
-                                    <p>[LAST MSG]</p>
-                                </div>
-                                <div class="column column-10 chatonline-contacts-contact-hide-column">
-                                    <h2>15:05</h2>
-                                </div>
-                            </div>
-                        </div>
+
+                                <?php
+                            }    
+                        }
+
+                        ?>
+
                     </div>
                 </div>
             </div>

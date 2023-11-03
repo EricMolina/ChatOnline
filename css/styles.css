@@ -217,6 +217,8 @@ span {
 .chatonline-contacts-contacts {
     margin-top: 2%;
     margin-left: 2%;
+    overflow-y: auto;
+    max-height: 63.1vh;
 }
 
 .chatonline-contacts-contact:hover {

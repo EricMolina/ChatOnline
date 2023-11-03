@@ -9,12 +9,6 @@
     <link rel="stylesheet" href="../css/styles.css">
     <script src="../js/functions.js"></script>
 </head>
-    <?php
-    //BORRAR ESTO LUEGO
-    session_start();
-    $_SESSION["is_logged"] = true;
-    header("location: ../index.php");
-    ?>
 <body class="chatonline-form-bg">
 
 <div class="chatonline-top-green-div">
@@ -29,7 +23,15 @@
     </div>
     <div class="row">
         <div class="column column-1 chatonline-form">
-            <p>LOGIN FORM</p>
+            <p>LOGIN FORM <span>
+                <?php 
+                if (isset($_GET["error"]) && $_GET["error"] == "invalid_login") 
+                    echo " - Invalid credentials."; 
+                if (isset($_GET["error_username"]) && $_GET["error_username"] == "required") 
+                    echo " - Username required."; 
+                if (isset($_GET["error_pwd"]) && $_GET["error_pwd"] == "required") 
+                    echo " - Password required."; 
+                ?></span></p>
             <form action="../proc/process_login.php" method="POST" class="chatonline-form-form" onsubmit="return ValidateLogin()">
 
                 <label for="username">USERNAME: <span id="username_e" style="display: none;">Enter the username.</span></label>

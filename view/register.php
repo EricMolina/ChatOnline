@@ -23,14 +23,28 @@
     </div>
     <div class="row">
         <div class="column column-1 chatonline-form">
-            <p>REGISTER FORM</p>
+            <p>REGISTER FORM <span>
+                <?php 
+                if (isset($_GET["error_username"]) && $_GET["error_username"] == "required") 
+                    echo " - Username required.";
+                if (isset($_GET["error_name"]) && $_GET["error_name"] == "required") 
+                    echo " - Name required.";  
+                if (isset($_GET["error_pwd1"]) && $_GET["error_pwd1"] == "required") 
+                    echo " - Password required."; 
+                if (isset($_GET["error_pwd2"]) && $_GET["error_pwd2"] == "required") 
+                    echo " - Second password required."; 
+                if (isset($_GET["error_pwd"]) && $_GET["error_pwd"] == "invalid") 
+                    echo " - Invalid password."; 
+                if (isset($_GET["error_username"]) && $_GET["error_username"] == "exists") 
+                    echo " - Username already exists.";
+                ?></span></p>
             <form action="../proc/process_register.php" method="POST" class="chatonline-form-form" onsubmit="return ValidateRegister()">
 
                 <label for="username">USERNAME: <span id="username_e" style="display: none;">Write the username.</span></label>
                 <input type="text" id="username" name="username" placeholder="username..." class="chatonline-form-input">
                 <br><br>
                 <label for="name">FULL NAME: <span id="name_e" style="display: none;">Write the full name.</span></label>
-                <input type="text" id="name" name="username" placeholder="full name..." class="chatonline-form-input">
+                <input type="text" id="name" name="name" placeholder="full name..." class="chatonline-form-input">
                 <br><br>
                 <label for="pwd1">PASSWORD: <span id="pwd1_e" style="display: none;">Write the first password.</span></label>
                 <input type="password" id="pwd1" name="pwd1" placeholder="password..." class="chatonline-form-input">

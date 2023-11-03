@@ -42,7 +42,7 @@ function get_post_fields_values($fields, $post) {
 
 function check_user_login($redirect_url) {
     /*  Cheking if isset is_logged session variable */
-    if(!isset($_SESSION['is_logged'])) {
+    if(!isset($_SESSION['is_logged']) || $_SESSION['is_logged'] != true) {
         header("Location: $redirect_url");
         exit();
     }
