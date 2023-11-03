@@ -5,14 +5,19 @@ include("./proc/db_connection.php");
 
 session_start();
 
-check_user_login("./views/login.php");
+check_user_login("./view/login.php");
 
 $logged_user = get_user_logedin();
+$logged_user_id = mysqli_escape_string($conn, $logged_user["id"]);
 
 
-// Search user
 
 if (isset($_GET['searched_user'])) {
+
+    // Search user
+
+    echo "---- BUSQUEDA USUARIOS ----<br>";
+
     $searched_user = "%".mysqli_escape_string($conn, $_GET['searched_user'])."%";
 
     $query_filter_users = "SELECT user.id, user.username, 
@@ -29,10 +34,10 @@ if (isset($_GET['searched_user'])) {
     mysqli_stmt_bind_param(
         $stmt_filter_users,
         "iiiiss",
-        $logged_user["id"],
-        $logged_user["id"],
-        $logged_user["id"],
-        $logged_user["id"],
+        $logged_user_id,
+        $logged_user_id,
+        $logged_user_id,
+        $logged_user_id,
         $searched_user,
         $searched_user
     );
@@ -54,7 +59,73 @@ if (isset($_GET['searched_user'])) {
             echo "Petición enviada";
             continue;
         }
-        echo "<a href='./proc/send_friend_request.php?id_user=".$user['id']."'>Enviar petición</a>";
+        echo "<a href='./proc/send_friend_request.php?id_user=".$user['id'].
+             "&searched_user=".$_GET['searched_user']."'>Enviar petición</a>";
     }
-}
 
+} else if (isset($_GET['window']) && $_GET['window'] == 'requests') {
+    
+    // Recived friend request
+    
+    echo "---- SOLICITUDES DE AMISTAD ----<br>";
+        
+    $query_get_friend_requests = "SELECT user.username as 'user_sender', friend_request.id as 'request_id'
+                                 FROM friend_request
+                                 INNER JOIN user ON friend_request.id_user_sender = user.id
+                                 WHERE friend_request.id_user_receiver = ?;";
+    
+    $stmt_get_friend_requests = mysqli_stmt_init($conn);
+    mysqli_stmt_prepare($stmt_get_friend_requests, $query_get_friend_requests);
+    mysqli_stmt_bind_param(
+        $stmt_get_friend_requests,
+        "i",
+        $logged_user_id,
+    );
+    mysqli_stmt_execute($stmt_get_friend_requests);
+    
+    $friend_requests_result = mysqli_stmt_get_result($stmt_get_friend_requests);
+    $friend_requests = mysqli_fetch_all($friend_requests_result, MYSQLI_ASSOC);
+    
+    mysqli_stmt_close($stmt_get_friend_requests);
+    
+    foreach ($friend_requests as $request) {
+        echo "Petición de ".$request['user_sender'].": ";
+        echo "<a href='./proc/respond_friend_request.php?response=accept&request_id=".$request['request_id']."'>Acpetar petición</a> | ";
+        echo "<a href='./proc/respond_friend_request.php?response=reject&request_id=".$request['request_id']."'>Rechazar petición</a>";
+    }    
+
+} else {
+
+    // User friends
+
+    echo "<br><br>---- CONTACTOS ----<br>";
+
+    $query_get_friend_ships = "SELECT IF(user1.id = ?, user2.username, user1.username) as 'friend_ship_username'
+                               FROM friend_ship
+                               INNER JOIN user user1 ON user1.id = friend_ship.id_user1
+                               INNER JOIN user user2 ON user2.id = friend_ship.id_user2
+                               WHERE friend_ship.id_user1 = ? OR friend_ship.id_user2 = ?;";
+
+    $stmt_get_friend_ships = mysqli_stmt_init($conn);
+    mysqli_stmt_prepare($stmt_get_friend_ships, $query_get_friend_ships);
+    mysqli_stmt_bind_param(
+    $stmt_get_friend_ships,
+        "iii",
+        $logged_user_id,
+        $logged_user_id,
+        $logged_user_id
+    );
+    mysqli_stmt_execute($stmt_get_friend_ships);
+
+    $friend_ships_result = mysqli_stmt_get_result($stmt_get_friend_ships);
+    $friend_ships = mysqli_fetch_all($friend_ships_result, MYSQLI_ASSOC);
+
+    mysqli_stmt_close($stmt_get_friend_ships);
+
+    echo "<ul>";
+    foreach ($friend_ships as $friend_ship) {
+        echo "<li>".$friend_ship['friend_ship_username']."</li>";
+    }
+    echo "</ul>";
+
+} 

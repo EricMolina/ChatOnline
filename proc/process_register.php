@@ -3,6 +3,7 @@
 include("./utils.php");
 include("./db_connection.php");
 
+session_start();
 
 // Register fields validation
 
@@ -23,7 +24,7 @@ if ($fields['pwd1']['value'] != $fields['pwd2']['value']) {
 
 if ($fields_errors) {
     $query_errors = http_build_query($fields_errors);
-    $url = "../views/register.php?".$query_errors;
+    $url = "../view/register.php?".$query_errors;
     header("Location: $url");
     die();
 }
@@ -47,7 +48,7 @@ try {
     $users_result = mysqli_stmt_get_result($stmt_get_users);
 
     if (mysqli_num_rows($users_result) > 0) {
-        header('Location: ../views/register.php?error_username=exists');
+        header('Location: ../view/register.php?error_username=exists');
         exit();
     }
 

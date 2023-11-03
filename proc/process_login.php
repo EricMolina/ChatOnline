@@ -19,7 +19,7 @@ $errors = [];
 
 if ($fields_errors) {
     $query_errors = http_build_query($fields_errors);
-    $url = "../views/login.php?".$query_errors;
+    $url = "../view/login.php?".$query_errors;
     header("Location: $url");
     die();
 }
@@ -40,7 +40,7 @@ try {
     $users_result = mysqli_stmt_get_result($stmt_get_users);
 
     if (mysqli_num_rows($users_result) == 0) {
-        header('Location: ../views/login.php?error=invalid_login');
+        header('Location: ../view/login.php?error=invalid_login');
         exit();
     }
 
@@ -48,7 +48,7 @@ try {
     $user = $users_result[0];
 
     if (!password_verify($pwd, $user['pwd'])) {
-        header('Location: ../views/login.php?error=invalid_login');
+        header('Location: ../view/login.php?error=invalid_login');
         exit();
     }
 
