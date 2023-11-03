@@ -363,11 +363,15 @@ span {
 
 .chatonline-chat-chat-content-message {
     border-radius: 10px;
-    padding: 1% 2%;
+    padding: 1% 2% 25px 2%;
     margin: 0.5% 1%;
     max-width: 60%;
     width: fit-content;
     word-wrap: break-word;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
 }
 
 .msg-sent {
@@ -379,6 +383,38 @@ span {
     background-color: #363636;
     align-self: flex-start;
 }
+
+.chatonline-chat-chat-message-text {
+    color: white;
+}
+
+.chatonline-chat-chat-timestamp {
+    position: absolute;
+    bottom: 5px;
+    right: 12px;
+    font-size: 0.75em;
+    color: #a2a2a2;
+    white-space: nowrap; 
+}
+
+.chatonline-chat-reload {
+    float: left; 
+    margin-top: 10%; 
+    width: 6vh; 
+    height: auto; 
+    margin-left: 90%; 
+    cursor: pointer;
+    transition: transform .6s ease-in-out;
+}
+
+.chatonline-chat-reload:hover {
+    transform: rotate(180deg);
+}
+
+@keyframes my-animation {
+    from { transform: scale(1); }
+    to { transform: scale(1.2); }
+  }
 
 .chatonline-chat-chat-footer {
     height: 10%;
@@ -408,7 +444,7 @@ span {
 .chatonline-chat-chat-footer-submit {
     width: 10%;
     height: 4vh;
-    padding: 1% 0.5%;
+    padding: 0.7vh 0.5%;
     margin: 1% 0;
     margin-left: 5%;
     display: inline-block;

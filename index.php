@@ -134,28 +134,23 @@
                     <div class="column column-1 chatonline-chat-chat-header">
                         <div class="row">
                             <div class="column column-2">
-                                <img src="./img/user.png" alt="" style="float: left; width: 55px; heigth: auto;">
+                                <img src="./img/user.png" alt="" style="float: left; width: 7vh; heigth: auto;">
                                 <h2 style="padding-left: 18%; padding-top: 2%;">[USERNAME]</h2>
                             </div>
-                            <div class="column column-40" style="padding-top: 1.5%;">
-                                <form action="./index.php" method="POST">
-                                    <input type="hidden" name="window" value="contacts">
-                                    <input type="text" name="searched_msg" class="chatonline-contacts-input">
-                                    <input type="hidden" name="contact" id="contact_field_searched_msg" value="<?php if (isset($_POST["contact"])) echo $_POST["contact"]; ?>">
-                                    <input type="submit" value="SEARCH" class="chatonline-contacts-submit">
-                                </form>
-                            </div>
+                            <div class="column column-40"></div>
                             <div class="column column-10">
-                                <img onclick="location.reload()" src="./img/reload.png" alt="" style="float: left; margin-top: 10%; width: 45px; heigth: auto; margin-left: 90%; cursor: pointer;">
+                                <img onclick="location.reload()" src="./img/reload.png" alt="" class="chatonline-chat-reload">
                             </div>
                         </div>
                     </div>
                     <div class="column column-1 chatonline-chat-chat-content">
                         <div class="chatonline-chat-chat-content-message msg-received">
-                            <p>test recibo</p>
+                            <span class="chatonline-chat-chat-message-text">Hola, ¿cómo estás? Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?</span>
+                            <span class="chatonline-chat-chat-timestamp">10/11/23 15:30</span>
                         </div>
                         <div class="chatonline-chat-chat-content-message msg-sent">
-                            <p>test envío</p>
+                            <span class="chatonline-chat-chat-message-text">¡Hola! Estoy bien, gracias. ¿Y tú?</span>
+                            <span class="chatonline-chat-chat-timestamp">10/11/23 15:32</span>
                         </div>
                     </div>
                     <div class="column column-1 chatonline-chat-chat-footer">

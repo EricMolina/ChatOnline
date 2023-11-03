@@ -11,9 +11,9 @@
 </head>
     <?php
     //BORRAR ESTO LUEGO
-    /*session_start();
+    session_start();
     $_SESSION["is_logged"] = true;
-    header("location: ../index.php");*/
+    header("location: ../index.php");
     ?>
 <body class="chatonline-form-bg">
 
