@@ -76,3 +76,12 @@ function CheckPassword(id1, id2) {
     document.getElementById("pwdcheck_e").style.display = "none";
     return true;
 }
+
+function CheckChatText() {
+    var obj = document.getElementsByClassName("chatonline-chat-chat-footer-input")[0];
+    if (obj.value == null || obj.value.length == 0 || /^\s+$/.test(obj.value)) {
+        document.getElementsByClassName("chatonline-chat-chat-footer-submit")[0].disabled = true;
+    } else {
+        document.getElementsByClassName("chatonline-chat-chat-footer-submit")[0].disabled = false;
+    }
+}

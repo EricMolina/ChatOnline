@@ -68,9 +68,28 @@ try {
     );
     mysqli_stmt_execute($stmt_create_user);
 
+    //Get last id on database
+    $userID = mysqli_insert_id($conn);
+    
+    $stmt_get_user = mysqli_stmt_init($conn);
+    $query_get_user = "SELECT * FROM user 
+                       WHERE username = ?";
+    mysqli_stmt_prepare($stmt_get_user, $query_get_user);
+    mysqli_stmt_bind_param(
+        $stmt_get_user,
+        "s",
+        $username
+    );
+    mysqli_stmt_execute($stmt_get_user);
+
+    $user_result = mysqli_stmt_get_result($stmt_get_user);
+    $user_result = mysqli_fetch_all($user_result, MYSQLI_ASSOC); 
+    $user = $user_result[0];
+
     mysqli_commit($conn);
 
     mysqli_stmt_close($stmt_create_user);
+    mysqli_stmt_close($stmt_get_user);
     mysqli_close($conn);
 
     $_SESSION['user_username'] = $user['username'];

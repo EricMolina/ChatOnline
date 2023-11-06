@@ -75,11 +75,19 @@ if (isset($_GET['searched_user'])) {
     // User friends
 
     $query_get_friend_ships = "SELECT IF(user1.id = ?, user2.username, user1.username) as 'friend_ship_username',
-                               IF(user1.id = ?, user2.id, user1.id)  as 'friend_ship_user_id'
-                               FROM friend_ship
-                               INNER JOIN user user1 ON user1.id = friend_ship.id_user1
-                               INNER JOIN user user2 ON user2.id = friend_ship.id_user2
-                               WHERE friend_ship.id_user1 = ? OR friend_ship.id_user2 = ?;";
+                                IF(user1.id = ?, user2.id, user1.id)  as 'friend_ship_user_id',
+                                msg.content as 'last_message_content', DATE_FORMAT(msg.date, '%H:%i') as 'last_message_date'
+                                FROM friend_ship
+                                INNER JOIN user user1 ON user1.id = friend_ship.id_user1
+                                INNER JOIN user user2 ON user2.id = friend_ship.id_user2
+                                LEFT JOIN (
+                                    SELECT message.id_friendship, MAX(message.date) AS max_timestamp
+                                    FROM message
+                                    GROUP BY message.id_friendship
+                                ) AS max_msg ON max_msg.id_friendship = friend_ship.id
+                                LEFT JOIN message msg ON max_msg.id_friendship = msg.id_friendship AND max_msg.max_timestamp = msg.date
+                                WHERE (friend_ship.id_user1 = ? OR friend_ship.id_user2 = ?)
+                                ORDER BY msg.date DESC;";
 
     $stmt_get_friend_ships = mysqli_stmt_init($conn);
     mysqli_stmt_prepare($stmt_get_friend_ships, $query_get_friend_ships);
@@ -120,7 +128,64 @@ if (isset($_GET['searched_user'])) {
         $_SESSION["contact"] = $_POST["contact"];
         echo '<input type="hidden" id="contact_id">'; //needed for js things
 
-        //on chat, read all chat
+
+        // Get contact friend ship
+
+        $contact_id = mysqli_escape_string($conn, $_POST["contact"]);
+        
+        $query_get_contact_friend_ship = "SELECT friend_ship.id as 'id', user.username as 'contact_username'
+                                          FROM db_chatonline.friend_ship
+                                          INNER JOIN user ON user.id = IF(friend_ship.id_user1=?, id_user2, id_user1)
+                                          WHERE (friend_ship.id_user1 = ? AND friend_ship.id_user2 = ?) OR
+                                          (friend_ship.id_user1 = ? AND friend_ship.id_user2 = ?);";
+
+        $stmt_get_contact_friend_ship = mysqli_stmt_init($conn);
+        mysqli_stmt_prepare($stmt_get_contact_friend_ship, $query_get_contact_friend_ship);
+        mysqli_stmt_bind_param(
+        $stmt_get_contact_friend_ship,
+            "iiiii",
+            $logged_user_id,
+            $logged_user_id,
+            $contact_id,
+            $contact_id,
+            $logged_user_id
+        );
+        mysqli_stmt_execute($stmt_get_contact_friend_ship);
+
+        $contact_friend_ship_result = mysqli_stmt_get_result($stmt_get_contact_friend_ship);
+
+        mysqli_stmt_close($stmt_get_contact_friend_ship);
+        
+        if (mysqli_num_rows($contact_friend_ship_result) == 0) {
+            header('Location: .');
+            exit();
+        }
+
+        $contact_friend_ship = mysqli_fetch_all($contact_friend_ship_result, MYSQLI_ASSOC);
+        $contact_friend_ship_id = $contact_friend_ship[0]['id'];
+        $contact_username = $contact_friend_ship[0]['contact_username'];
+
+
+        // Get contact messages
+
+        $query_get_contact_messages = "SELECT *, DATE_FORMAT(message.date, '%Y/%m/%d %H:%i') as 'message_datetime'
+                                        FROM db_chatonline.message
+                                        WHERE id_friendship = ?;";
+
+        $stmt_get_contact_messages = mysqli_stmt_init($conn);
+        mysqli_stmt_prepare($stmt_get_contact_messages, $query_get_contact_messages);
+        mysqli_stmt_bind_param(
+        $stmt_get_contact_messages,
+            "i",
+            $contact_friend_ship_id,
+        );
+        mysqli_stmt_execute($stmt_get_contact_messages);
+
+        $contact_messages_result = mysqli_stmt_get_result($stmt_get_contact_messages);
+
+        mysqli_stmt_close($stmt_get_contact_messages);
+
+        $contact_messages = mysqli_fetch_all($contact_messages_result, MYSQLI_ASSOC);
     }
 
 ?>
@@ -133,7 +198,7 @@ if (isset($_GET['searched_user'])) {
             </div>
             <div class="column column-5"></div>
             <div class="column column-30" style="text-align: right; padding-top: 2.5%;">
-                <a href="./view/login.php" style="color: white;">Close session</a>
+                <a href="./view/login.php" style="color: white;">Close session [<?php echo strtoupper($logged_user["username"]) ?>]</a>
             </div>
         </div>
         <div class="row">
@@ -175,23 +240,49 @@ if (isset($_GET['searched_user'])) {
 
                             foreach ($filtered_users as $user) {
                                 ?>
-                                <div class="column column-1 chatonline-contacts-contact">
+                                <div class="column column-1 chatonline-contacts-contact"
+                                    <?php
+                                    if ($user['is_friend']) {
+                                        echo "onclick='window.location.href = \"./proc/remove_friend.php?id_user=".$user['id'].
+                                        "&searched_user=".$_GET['searched_user']."\"'";
+                                    } else if  ($user['has_request']) {
+                                        echo "onclick=''";
+                                    } else {
+                                        echo "onclick='window.location.href = \"./proc/send_friend_request.php?id_user=".$user['id'].
+                                        "&searched_user=".$_GET['searched_user']."\"'";
+                                    }
+                                    ?>
+                                >
                                     <div class="row">
                                         <div class="column column-30 chatonline-contacts-contact-hide-column">
                                             <img src="./img/user.png" alt="logo" class="chatonline-contacts-contact-icon chatonline-svg-white">
                                         </div>
-                                        <div class="column column-60">
+                                        <div class="column column-2">
                                             <h1><?php echo $user['username']; ?></h1>
+                                            <p class="chatonline-contacts-contact-request-text">
                                             <?php
                                             if ($user['is_friend']) {
-                                                echo "Ya es tu amigo";
+                                                echo "Remove contact";
                                             } else if  ($user['has_request']) {
-                                                echo "Petición enviada";
+                                                echo "Pending request";
                                             } else {
-                                                echo "<a href='./proc/send_friend_request.php?id_user=".$user['id'].
-                                                "&searched_user=".$_GET['searched_user']."'>Enviar petición</a>";
+                                                echo "Send request";
                                             }
                                             ?>
+                                            </p>
+                                        </div>
+                                        <div class="column column-5 chatonline-contacts-contact-hide-column">
+                                            <img src="
+                                            <?php
+                                            if ($user['is_friend']) {
+                                                echo "./img/user_del.png";
+                                            } else if  ($user['has_request']) {
+                                                echo "./img/user_req.png";
+                                            } else {
+                                                echo "./img/user_add.png";
+                                            }
+                                            ?>
+                                            " alt="logo" class="chatonline-contacts-contact-request-button">
                                         </div>
                                     </div>
                                 </div>
@@ -212,10 +303,18 @@ if (isset($_GET['searched_user'])) {
                                         </div>
                                         <div class="column column-60">
                                             <h1><?php echo $friend_ship['friend_ship_username']; ?></h1>
-                                            <p>[LAST MSG]</p>
+                                            <p style="opacity: 60%"><?php 
+                                            
+                                            if (strlen($friend_ship['last_message_content']) <= 15) {
+                                                echo $friend_ship['last_message_content'];
+                                            } else {
+                                                echo str_split($friend_ship['last_message_content'], 15)[0]."...";
+                                            }
+
+                                            ?></p>
                                         </div>
                                         <div class="column column-10 chatonline-contacts-contact-hide-column">
-                                            <h2>15:05</h2>
+                                            <h2><?php echo $friend_ship['last_message_date']; ?></h2>
                                         </div>
                                     </div>
                                 </div>
@@ -236,8 +335,8 @@ if (isset($_GET['searched_user'])) {
                                         </div>
                                         <div class="column column-60">
                                             <h1><?php echo $request['user_sender']; ?></h1>
-                                            <p><a href='./proc/respond_friend_request.php?response=accept&request_id="<?php echo $request['request_id']; ?>"'>Acpetar petición</a></p>
-                                            <p><a href='./proc/respond_friend_request.php?response=reject&request_id="<?php echo $request['request_id']; ?>"'>Rechazar petición</a></p>
+                                            <p><a href='./proc/respond_friend_request.php?response=accept&request_id=<?php echo $request['request_id']; ?>'>Acpetar petición</a></p>
+                                            <p><a href='./proc/respond_friend_request.php?response=reject&request_id=<?php echo $request['request_id']; ?>'>Rechazar petición</a></p>
                                         </div>
                                     </div>
                                 </div>
@@ -264,7 +363,13 @@ if (isset($_GET['searched_user'])) {
                         <div class="row">
                             <div class="column column-2">
                                 <img src="./img/user.png" alt="" style="float: left; width: 7vh; heigth: auto;">
-                                <h2 style="padding-left: 18%; padding-top: 2%;">[USERNAME]</h2>
+                                <?php 
+                                
+                                if (isset($_POST['contact'])) {
+                                    echo "<h2 style='padding-left: 18%; padding-top: 2%;'>".$contact_username."</h2>";
+                                }
+                                
+                                ?>
                             </div>
                             <div class="column column-40"></div>
                             <div class="column column-10">
@@ -273,21 +378,29 @@ if (isset($_GET['searched_user'])) {
                         </div>
                     </div>
                     <div class="column column-1 chatonline-chat-chat-content">
-                        <div class="chatonline-chat-chat-content-message msg-received">
-                            <span class="chatonline-chat-chat-message-text">Hola, ¿cómo estás? Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?Hola, ¿cómo estás?</span>
-                            <span class="chatonline-chat-chat-timestamp">10/11/23 15:30</span>
-                        </div>
-                        <div class="chatonline-chat-chat-content-message msg-sent">
-                            <span class="chatonline-chat-chat-message-text">¡Hola! Estoy bien, gracias. ¿Y tú?</span>
-                            <span class="chatonline-chat-chat-timestamp">10/11/23 15:32</span>
-                        </div>
+                        <?php
+
+                        if (isset($_POST['contact'])) {
+                            foreach ($contact_messages as $message) {
+                                $message_sender = $message['id_user_sender'] == $logged_user_id ? 'msg-sent' : 'msg-received';
+                                ?>
+                                <div class="chatonline-chat-chat-content-message <?php echo $message_sender; ?>">
+                                    <span class="chatonline-chat-chat-message-text"><?php echo $message['content']; ?></span>
+                                    <span class="chatonline-chat-chat-timestamp"><?php echo $message['message_datetime']; ?></span>
+                                </div>
+                                <?php
+                            }
+                        }
+
+                        ?>
                     </div>
                     <div class="column column-1 chatonline-chat-chat-footer">
-                        <form action="./proc/send_msg.php" method="POST">
+                        <form action="./proc/send_message.php" method="POST">
                             <input type="hidden" name="window" value="contacts">
+                            <input type="hidden" name="contact_friend_ship" id="contact_friend_ship" value="<?php if (isset($_POST["contact"])) echo $contact_friend_ship_id; ?>">
                             <input type="hidden" name="contact" id="contact_field_send_msg" value="<?php if (isset($_POST["contact"])) echo $_POST["contact"]; ?>">
-                            <input type="text" name="msg" class="chatonline-chat-chat-footer-input" placeholder="Type a message">
-                            <input type="submit" value="SEND" class="chatonline-chat-chat-footer-submit">
+                            <input oninput="CheckChatText();" type="text" name="msg" class="chatonline-chat-chat-footer-input" placeholder="Type a message">
+                            <input type="submit" value="SEND" class="chatonline-chat-chat-footer-submit" disabled>
                         </form>
                     </div>
                 </div>

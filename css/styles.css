@@ -240,6 +240,19 @@ span {
     padding-top: 20%;
 }
 
+.chatonline-contacts-contact-request-button {
+    width: 150%;
+    height: auto;
+    margin-top: 15%;
+    margin-left: 20%;
+}
+
+.chatonline-contacts-contact-request-text {
+    text-decoration: none;
+    color: gray;
+    font-style: italic;
+}
+
 .chatonline-contacts-input {
     float: left;
     width: 65%;
@@ -369,6 +382,7 @@ span {
     margin: 0.5% 1%;
     max-width: 60%;
     width: fit-content;
+    min-width: 125px;
     word-wrap: break-word;
     display: flex;
     justify-content: space-between;
@@ -462,6 +476,15 @@ span {
 }
 .chatonline-chat-chat-footer-submit:hover {
     background-color: #616161;
+}
+
+.chatonline-chat-chat-footer-submit:disabled,
+.chatonline-chat-chat-footer-submit[disabled]{
+  background-color: #303030;
+  box-shadow: 0px 3px 0px black,
+  inset 0px 0px 12px black;
+  color: black;
+  cursor:default;
 }
 
 @media screen and (max-width: 800px) {
