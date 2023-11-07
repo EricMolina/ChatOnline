@@ -21,6 +21,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
             document.getElementsByClassName("chatonline-chat-nochat")[0].style.display = "flex";
         }
     }
+    var chatContainer = document.getElementsByClassName('chatonline-chat-chat-content')[0];
+    chatContainer.scrollTop = chatContainer.scrollHeight;
 });
 
 function ChangeToggler(data) {
@@ -30,32 +32,6 @@ function ChangeToggler(data) {
 function ChangeContact(id) {
     document.getElementById("contact_field").value = id;
     document.getElementById('form_contact_field').submit();
-}
-
-function ValidateLogin() {
-    var final = true;
-    if (!CheckText("username"))
-        final = false;
-    if (!CheckText("pwd"))
-        final = false;
-    
-    return final;
-}
-
-function ValidateRegister() {
-    var final = true;
-    if (!CheckText("username"))
-        final = false;
-    if (!CheckText("name"))
-        final = false;
-    if (!CheckText("pwd1"))
-        final = false;
-    if (!CheckText("pwd2"))
-        final = false;
-    if (!CheckPassword("pwd1", "pwd2"))
-        final = false;
-    
-    return final;
 }
 
 function CheckText(id) { 
@@ -77,7 +53,7 @@ function CheckPassword(id1, id2) {
     return true;
 }
 
-function CheckChatText() {
+function CheckChatText() { 
     var obj = document.getElementsByClassName("chatonline-chat-chat-footer-input")[0];
     if (obj.value == null || obj.value.length == 0 || /^\s+$/.test(obj.value)) {
         document.getElementsByClassName("chatonline-chat-chat-footer-submit")[0].disabled = true;

@@ -54,5 +54,6 @@ try {
 } catch (Exception $e) {
     mysqli_rollback($conn);
     echo "Error al enviar mensaje: ".$e->getMessage();
-    die();
+    mysqli_close($conn);
+    header("location: ../index.php");
 }

@@ -27,17 +27,19 @@
                 <?php 
                 if (isset($_GET["error"]) && $_GET["error"] == "invalid_login") 
                     echo " - Invalid credentials."; 
-                if (isset($_GET["error_username"]) && $_GET["error_username"] == "required") 
-                    echo " - Username required."; 
-                if (isset($_GET["error_pwd"]) && $_GET["error_pwd"] == "required") 
-                    echo " - Password required."; 
                 ?></span></p>
-            <form action="../proc/process_login.php" method="POST" class="chatonline-form-form" onsubmit="return ValidateLogin()">
+            <form action="../proc/process_login.php" method="POST" class="chatonline-form-form">
 
-                <label for="username">USERNAME: <span id="username_e" style="display: none;">Enter the username.</span></label>
+                <label for="username">USERNAME: <span id="username_e" style="display: 
+                <?php 
+                    if (isset($_GET["error_username"]) && $_GET["error_username"] == "required") { echo "inline"; } else { echo "none"; }
+                ?>;">Enter the username.</span></label>
                 <input type="text" id="username" name="username" placeholder="username..." class="chatonline-form-input">
                 <br><br>
-                <label for="pwd">PASSWORD: <span id="pwd_e" style="display: none;">Enter the password.</span></label>
+                <label for="pwd">PASSWORD: <span id="pwd_e" style="display: 
+                <?php 
+                    if (isset($_GET["error_pwd"]) && $_GET["error_pwd"] == "required") { echo "inline"; } else { echo "none"; }
+                ?>;">Enter the password.</span></label>
                 <input type="password" id="pwd" name="pwd" placeholder="password..." class="chatonline-form-input">
                 <br>
                 <input type="submit" value="LOGIN" class="chatonline-form-submit">

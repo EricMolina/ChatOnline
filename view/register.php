@@ -25,33 +25,34 @@
         <div class="column column-1 chatonline-form">
             <p>REGISTER FORM <span>
                 <?php 
-                if (isset($_GET["error_username"]) && $_GET["error_username"] == "required") 
-                    echo " - Username required.";
-                if (isset($_GET["error_name"]) && $_GET["error_name"] == "required") 
-                    echo " - Name required.";  
-                if (isset($_GET["error_pwd1"]) && $_GET["error_pwd1"] == "required") 
-                    echo " - Password required."; 
-                if (isset($_GET["error_pwd2"]) && $_GET["error_pwd2"] == "required") 
-                    echo " - Second password required."; 
-                if (isset($_GET["error_pwd"]) && $_GET["error_pwd"] == "invalid") 
-                    echo " - Invalid password."; 
                 if (isset($_GET["error_username"]) && $_GET["error_username"] == "exists") 
                     echo " - Username already exists.";
                 ?></span></p>
-            <form action="../proc/process_register.php" method="POST" class="chatonline-form-form" onsubmit="return ValidateRegister()">
+            <form action="../proc/process_register.php" method="POST" class="chatonline-form-form">
 
-                <label for="username">USERNAME: <span id="username_e" style="display: none;">Write the username.</span></label>
+                <label for="username">USERNAME: <span id="username_e" style="display: 
+                <?php 
+                    if (isset($_GET["error_username"]) && $_GET["error_username"] == "required") { echo "inline"; } else { echo "none"; }
+                ?>;">Write the username.</span></label>
                 <input type="text" id="username" name="username" placeholder="username..." class="chatonline-form-input">
                 <br><br>
-                <label for="name">FULL NAME: <span id="name_e" style="display: none;">Write the full name.</span></label>
+                <label for="name">FULL NAME: <span id="name_e" style="display: <?php 
+                    if (isset($_GET["error_name"]) && $_GET["error_name"] == "required") { echo "inline"; } else { echo "none"; }
+                ?>;">Write the full name.</span></label>
                 <input type="text" id="name" name="name" placeholder="full name..." class="chatonline-form-input">
                 <br><br>
-                <label for="pwd1">PASSWORD: <span id="pwd1_e" style="display: none;">Write the first password.</span></label>
+                <label for="pwd1">PASSWORD: <span id="pwd1_e" style="display: <?php 
+                    if (isset($_GET["error_pwd1"]) && $_GET["error_pwd1"] == "required") { echo "inline"; } else { echo "none"; }
+                ?>;">Write the first password.</span></label>
                 <input type="password" id="pwd1" name="pwd1" placeholder="password..." class="chatonline-form-input">
                 <br><br>
-                <label for="pwd2">VERIFY PASSWORD: <span id="pwd2_e" style="display: none;">Write the second password.</span></label>
+                <label for="pwd2">VERIFY PASSWORD: <span id="pwd2_e" style="display: <?php 
+                    if (isset($_GET["error_pwd2"]) && $_GET["error_pwd2"] == "required") { echo "inline"; } else { echo "none"; }
+                ?>;">Write the second password.</span></label>
                 <input type="password" id="pwd2" name="pwd2" placeholder="password..." class="chatonline-form-input">
-                <span id="pwdcheck_e" style="display: none;">Passwords doesn't match.</span>
+                <span id="pwdcheck_e" style="display: <?php 
+                    if (isset($_GET["error_pwd"]) && $_GET["error_pwd"] == "invalid") { echo "inline"; } else { echo "none"; }
+                ?>;">Passwords doesn't match.</span>
                 <br>
                 <input type="submit" value="REGISTER" class="chatonline-form-submit">
             </form>

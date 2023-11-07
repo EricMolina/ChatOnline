@@ -198,7 +198,8 @@ if (isset($_GET['searched_user'])) {
             </div>
             <div class="column column-5"></div>
             <div class="column column-30" style="text-align: right; padding-top: 2.5%;">
-                <a href="./view/login.php" style="color: white;">Close session [<?php echo strtoupper($logged_user["username"]) ?>]</a>
+                <a href="./view/login.php" style="color: white;">Close session [
+                    <?php echo htmlentities(strtoupper($logged_user["username"]), ENT_QUOTES, 'UTF-8') ?>]</a>
             </div>
         </div>
         <div class="row">
@@ -207,7 +208,17 @@ if (isset($_GET['searched_user'])) {
                     <div class="column column-1 chatonline-contacts-title">
                         <div class="row">
                             <div class="column column-2">
-                                <p>CONTACTS</p>
+                                <p>
+                                    <?php
+                                        if (isset($_GET['searched_user'])) {
+                                            echo "ALL USERS";
+                                        } else if (!isset($_GET['window']) || $_GET['window'] != 'requests') {
+                                            echo "CONTACTS";
+                                        } else {
+                                            echo "REQUESTS";
+                                        }
+                                    ?>
+                                </p>
                             </div>
                             <div class="column column-2">
                                 <div class="row chatonline-contacts-toggler">
@@ -243,13 +254,13 @@ if (isset($_GET['searched_user'])) {
                                 <div class="column column-1 chatonline-contacts-contact"
                                     <?php
                                     if ($user['is_friend']) {
-                                        echo "onclick='window.location.href = \"./proc/remove_friend.php?id_user=".$user['id'].
+                                        echo "onclick='window.location.href = \"./proc/remove_friend.php?id_user=".htmlentities($user['id'], ENT_QUOTES, 'UTF-8').
                                         "&searched_user=".$_GET['searched_user']."\"'";
                                     } else if  ($user['has_request']) {
                                         echo "onclick=''";
                                     } else {
-                                        echo "onclick='window.location.href = \"./proc/send_friend_request.php?id_user=".$user['id'].
-                                        "&searched_user=".$_GET['searched_user']."\"'";
+                                        echo "onclick='window.location.href = \"./proc/send_friend_request.php?id_user=".htmlentities($user['id'], ENT_QUOTES, 'UTF-8').
+                                        "&searched_user=".htmlentities($_GET['searched_user'], ENT_QUOTES, 'UTF-8')."\"'";
                                     }
                                     ?>
                                 >
@@ -258,7 +269,7 @@ if (isset($_GET['searched_user'])) {
                                             <img src="./img/user.png" alt="logo" class="chatonline-contacts-contact-icon chatonline-svg-white">
                                         </div>
                                         <div class="column column-2">
-                                            <h1><?php echo $user['username']; ?></h1>
+                                            <h1><?php echo htmlentities($user['username'], ENT_QUOTES, 'UTF-8'); ?></h1>
                                             <p class="chatonline-contacts-contact-request-text">
                                             <?php
                                             if ($user['is_friend']) {
@@ -296,25 +307,25 @@ if (isset($_GET['searched_user'])) {
 
                             foreach ($friend_ships as $friend_ship) {
                                 ?>
-                                <div onclick="ChangeContact(<?php echo $friend_ship['friend_ship_user_id']; ?>)" class="column column-1 chatonline-contacts-contact">
+                                <div onclick="ChangeContact(<?php echo htmlentities($friend_ship['friend_ship_user_id'], ENT_QUOTES, 'UTF-8'); ?>)" class="column column-1 chatonline-contacts-contact">
                                     <div class="row">
                                         <div class="column column-30 chatonline-contacts-contact-hide-column">
                                             <img src="./img/user.png" alt="logo" class="chatonline-contacts-contact-icon chatonline-svg-white">
                                         </div>
                                         <div class="column column-60">
-                                            <h1><?php echo $friend_ship['friend_ship_username']; ?></h1>
+                                            <h1><?php echo htmlentities($friend_ship['friend_ship_username'], ENT_QUOTES, 'UTF-8'); ?></h1>
                                             <p style="opacity: 60%"><?php 
                                             
                                             if (strlen($friend_ship['last_message_content']) <= 15) {
-                                                echo $friend_ship['last_message_content'];
+                                                echo htmlentities($friend_ship['last_message_content'], ENT_QUOTES, 'UTF-8');
                                             } else {
-                                                echo str_split($friend_ship['last_message_content'], 15)[0]."...";
+                                                echo htmlentities(str_split($friend_ship['last_message_content'], 15)[0]."...", ENT_QUOTES, 'UTF-8');
                                             }
 
                                             ?></p>
                                         </div>
                                         <div class="column column-10 chatonline-contacts-contact-hide-column">
-                                            <h2><?php echo $friend_ship['last_message_date']; ?></h2>
+                                            <h2><?php echo htmlentities($friend_ship['last_message_date'], ENT_QUOTES, 'UTF-8'); ?></h2>
                                         </div>
                                     </div>
                                 </div>
@@ -328,15 +339,30 @@ if (isset($_GET['searched_user'])) {
                             foreach ($friend_requests as $request) {
                                 ?>
 
-                                <div class="column column-1 chatonline-contacts-contact">
+                                <div class="column column-1 chatonline-contacts-contact" style="cursor: default;">
                                     <div class="row">
                                         <div class="column column-30 chatonline-contacts-contact-hide-column">
                                             <img src="./img/user.png" alt="logo" class="chatonline-contacts-contact-icon chatonline-svg-white">
                                         </div>
-                                        <div class="column column-60">
-                                            <h1><?php echo $request['user_sender']; ?></h1>
-                                            <p><a href='./proc/respond_friend_request.php?response=accept&request_id=<?php echo $request['request_id']; ?>'>Acpetar petición</a></p>
-                                            <p><a href='./proc/respond_friend_request.php?response=reject&request_id=<?php echo $request['request_id']; ?>'>Rechazar petición</a></p>
+                                        <!--<div class="column column-60">
+                                            <h1><?php echo htmlentities($request['user_sender'], ENT_QUOTES, 'UTF-8'); ?></h1>
+                                            <p><a href='./proc/respond_friend_request.php?response=accept&request_id=<?php echo htmlentities($request['request_id'], ENT_QUOTES, 'UTF-8'); ?>'>Aceptar petición</a></p>
+                                            <p><a href='./proc/respond_friend_request.php?response=reject&request_id=<?php echo htmlentities($request['request_id'], ENT_QUOTES, 'UTF-8'); ?>'>Rechazar petición</a></p>
+                                        </div>-->
+                                        <div class="column column-2">
+                                            <h1><?php echo htmlentities($request['user_sender'], ENT_QUOTES, 'UTF-8'); ?></h1>
+                                        </div>
+                                        <div class="" style="float: left; width: 110px; height: 100px;">
+                                            <img src="./img/check.png" onclick=
+                                            <?php 
+                                            echo "\"window.location.href = './proc/respond_friend_request.php?response=accept&request_id=".htmlentities($request['request_id'], ENT_QUOTES, 'UTF-8')."'\"";
+                                            ?>
+                                            alt="logo" class="chatonline-contacts-contact-requests-button" style="cursor: pointer;">
+                                            <img src="./img/cross.png" onclick=
+                                            <?php 
+                                            echo "\"window.location.href = './proc/respond_friend_request.php?response=reject&request_id=".htmlentities($request['request_id'], ENT_QUOTES, 'UTF-8')."'\"";
+                                            ?>
+                                            alt="logo" class="chatonline-contacts-contact-requests-button" style="cursor: pointer;">
                                         </div>
                                     </div>
                                 </div>
@@ -366,7 +392,7 @@ if (isset($_GET['searched_user'])) {
                                 <?php 
                                 
                                 if (isset($_POST['contact'])) {
-                                    echo "<h2 style='padding-left: 18%; padding-top: 2%;'>".$contact_username."</h2>";
+                                    echo "<h2 style='padding-left: 18%; padding-top: 2%;'>".htmlentities($contact_username, ENT_QUOTES, 'UTF-8')."</h2>";
                                 }
                                 
                                 ?>
@@ -384,9 +410,9 @@ if (isset($_GET['searched_user'])) {
                             foreach ($contact_messages as $message) {
                                 $message_sender = $message['id_user_sender'] == $logged_user_id ? 'msg-sent' : 'msg-received';
                                 ?>
-                                <div class="chatonline-chat-chat-content-message <?php echo $message_sender; ?>">
-                                    <span class="chatonline-chat-chat-message-text"><?php echo $message['content']; ?></span>
-                                    <span class="chatonline-chat-chat-timestamp"><?php echo $message['message_datetime']; ?></span>
+                                <div class="chatonline-chat-chat-content-message <?php echo htmlentities($message_sender, ENT_QUOTES, 'UTF-8'); ?>">
+                                    <span class="chatonline-chat-chat-message-text"><?php echo htmlentities($message['content'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                    <span class="chatonline-chat-chat-timestamp"><?php echo htmlentities($message['message_datetime'], ENT_QUOTES, 'UTF-8'); ?></span>
                                 </div>
                                 <?php
                             }
@@ -397,8 +423,8 @@ if (isset($_GET['searched_user'])) {
                     <div class="column column-1 chatonline-chat-chat-footer">
                         <form action="./proc/send_message.php" method="POST">
                             <input type="hidden" name="window" value="contacts">
-                            <input type="hidden" name="contact_friend_ship" id="contact_friend_ship" value="<?php if (isset($_POST["contact"])) echo $contact_friend_ship_id; ?>">
-                            <input type="hidden" name="contact" id="contact_field_send_msg" value="<?php if (isset($_POST["contact"])) echo $_POST["contact"]; ?>">
+                            <input type="hidden" name="contact_friend_ship" id="contact_friend_ship" value="<?php if (isset($_POST["contact"])) echo htmlentities($contact_friend_ship_id, ENT_QUOTES, 'UTF-8'); ?>">
+                            <input type="hidden" name="contact" id="contact_field_send_msg" value="<?php if (isset($_POST["contact"])) echo htmlentities($_POST["contact"], ENT_QUOTES, 'UTF-8'); ?>">
                             <input oninput="CheckChatText();" type="text" name="msg" class="chatonline-chat-chat-footer-input" placeholder="Type a message">
                             <input type="submit" value="SEND" class="chatonline-chat-chat-footer-submit" disabled>
                         </form>

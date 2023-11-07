@@ -63,5 +63,6 @@ try {
 
 } catch (Exception $e) {
     echo "Error al hacer login: ".$e->getMessage();
-    die();
+    mysqli_close($conn);
+    header("location: ../index.php");
 }
