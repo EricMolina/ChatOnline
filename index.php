@@ -133,7 +133,7 @@ if (isset($_GET['searched_user'])) {
 
         $contact_id = mysqli_escape_string($conn, $_POST["contact"]);
         
-        $query_get_contact_friend_ship = "SELECT friend_ship.id as 'id', user.username as 'contact_username'
+        $query_get_contact_friend_ship = "SELECT friend_ship.id as 'id', user.name as 'contact_username'
                                           FROM db_chatonline.friend_ship
                                           INNER JOIN user ON user.id = IF(friend_ship.id_user1=?, id_user2, id_user1)
                                           WHERE (friend_ship.id_user1 = ? AND friend_ship.id_user2 = ?) OR
