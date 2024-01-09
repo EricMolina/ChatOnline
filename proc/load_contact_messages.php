@@ -8,67 +8,46 @@ session_start();
 check_user_login("./view/login.php");
 
 $logged_user = get_user_logedin();
-$logged_user_id = mysqli_escape_string($conn, $logged_user["id"]);
+$logged_user_id = $logged_user["id"];
 
 
 // Get contact friend ship
 
-$contact_id = mysqli_escape_string($conn, $_GET["contact"]);
+$contact_id = $_GET["contact"];
 
 $query_get_contact_friend_ship = "SELECT friend_ship.id as 'id', user.name as 'contact_username'
                                     FROM db_chatonline.friend_ship
-                                    INNER JOIN user ON user.id = IF(friend_ship.id_user1=?, id_user2, id_user1)
-                                    WHERE (friend_ship.id_user1 = ? AND friend_ship.id_user2 = ?) OR
-                                    (friend_ship.id_user1 = ? AND friend_ship.id_user2 = ?);";
+                                    INNER JOIN user ON user.id = IF(friend_ship.id_user1= :a, id_user2, id_user1)
+                                    WHERE (friend_ship.id_user1 = :b AND friend_ship.id_user2 = :c) OR
+                                    (friend_ship.id_user1 = :d AND friend_ship.id_user2 = :e);";
 
-$stmt_get_contact_friend_ship = mysqli_stmt_init($conn);
-mysqli_stmt_prepare($stmt_get_contact_friend_ship, $query_get_contact_friend_ship);
-mysqli_stmt_bind_param(
-    $stmt_get_contact_friend_ship,
-    "iiiii",
-    $logged_user_id,
-    $logged_user_id,
-    $contact_id,
-    $contact_id,
-    $logged_user_id
-);
-mysqli_stmt_execute($stmt_get_contact_friend_ship);
+$stmt_get_contact_friend_ship = $conn->prepare($query_get_contact_friend_ship);
+$stmt_get_contact_friend_ship->bindParam(":a", $logged_user_id);
+$stmt_get_contact_friend_ship->bindParam(":b", $logged_user_id);
+$stmt_get_contact_friend_ship->bindParam(":c", $contact_id);
+$stmt_get_contact_friend_ship->bindParam(":d", $contact_id);
+$stmt_get_contact_friend_ship->bindParam(":e", $logged_user_id);
+$stmt_get_contact_friend_ship->execute();
+$contact_friend_ship_result = $stmt_get_contact_friend_ship->fetchAll(PDO::FETCH_ASSOC);
 
-$contact_friend_ship_result = mysqli_stmt_get_result($stmt_get_contact_friend_ship);
-
-mysqli_stmt_close($stmt_get_contact_friend_ship);
-
-if (mysqli_num_rows($contact_friend_ship_result) == 0) {
+if (count($contact_friend_ship_result) == 0) {
     header('Location: .');
     exit();
 }
-
-$contact_friend_ship = mysqli_fetch_all($contact_friend_ship_result, MYSQLI_ASSOC);
-$contact_friend_ship_id = $contact_friend_ship[0]['id'];
-$contact_username = $contact_friend_ship[0]['contact_username'];
+$contact_friend_ship_id = $contact_friend_ship_result[0]['id'];
+$contact_username = $contact_friend_ship_result[0]['contact_username'];
 
 
 // Get contact messages
 
 $query_get_contact_messages = "SELECT *, DATE_FORMAT(message.date, '%Y/%m/%d %H:%i') as 'message_datetime'
                                     FROM db_chatonline.message
-                                    WHERE id_friendship = ?;";
+                                    WHERE id_friendship = :a;";
 
-$stmt_get_contact_messages = mysqli_stmt_init($conn);
-mysqli_stmt_prepare($stmt_get_contact_messages, $query_get_contact_messages);
-mysqli_stmt_bind_param(
-    $stmt_get_contact_messages,
-    "i",
-    $contact_friend_ship_id,
-);
-mysqli_stmt_execute($stmt_get_contact_messages);
-
-$contact_messages_result = mysqli_stmt_get_result($stmt_get_contact_messages);
-
-mysqli_stmt_close($stmt_get_contact_messages);
-
-$contact_messages = mysqli_fetch_all($contact_messages_result, MYSQLI_ASSOC);
-
+$stmt_get_contact_messages = $conn->prepare($query_get_contact_messages);
+$stmt_get_contact_messages->bindParam(":a", $contact_friend_ship_id);
+$stmt_get_contact_messages->execute();
+$contact_messages = $stmt_get_contact_messages->fetchAll(PDO::FETCH_ASSOC);
 
 $data = [
     'logged_user_id' => $logged_user_id,

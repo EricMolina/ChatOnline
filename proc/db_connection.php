@@ -1,22 +1,12 @@
 <?php
 
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
-$db_server = "localhost";
+$db_server = "mysql:dbname=db_chatonline;host:localhost";
 $db_username = "root";
-$db_password = "asdASD123";
-$db_database = "db_chatonline";
+$db_password = "";
 
 try {
-    $conn = @mysqli_connect(
-        $db_server,
-        $db_username,
-        $db_password,
-        $db_database
-    );
-
-} catch (Exception $e) {
-    echo "Error en la conexión con la base de datos: ".$e->getMessage();
-    mysqli_close($conn);
-    header("location: ../index.php");
+    $conn = new PDO($db_server, $db_username, $db_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
+} catch(PDOException $e) {
+    echo "Conexión fallida: ".$e->getMessage();
+    exit();
 }

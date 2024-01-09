@@ -32,65 +32,39 @@ if ($fields_errors) {
 
 // Login register
 
-$username = mysqli_escape_string($conn, $fields['username']['value']);
-$name = mysqli_escape_string($conn, $fields['name']['value']);
-$pwd = mysqli_escape_string($conn, $fields['pwd1']['value']);
+$username = $fields['username']['value'];
+$name = $fields['name']['value'];
+$pwd = $fields['pwd1']['value'];
 $encrypted_pwd = password_hash($pwd, PASSWORD_BCRYPT);
 
 try {
     // Check if username already exists
-    $query_get_users = "SELECT * FROM user WHERE username = ?";
-    $stmt_get_users = mysqli_stmt_init($conn);
-    mysqli_stmt_prepare($stmt_get_users, $query_get_users);
-    mysqli_stmt_bind_param($stmt_get_users, "s", $username);
-    mysqli_stmt_execute($stmt_get_users);
+    $stmt_get_users = $conn->prepare("SELECT * FROM user WHERE username = ?");
+    $stmt_get_users->execute([$username]);
+    $users_result = $stmt_get_users->fetchAll(PDO::FETCH_ASSOC);
 
-    $users_result = mysqli_stmt_get_result($stmt_get_users);
-
-    if (mysqli_num_rows($users_result) > 0) {
+    if (count($users_result) > 0) {
         header('Location: ../view/register.php?error_username=exists');
         exit();
     }
 
     // Create user
-    mysqli_autocommit($conn, false);
-    mysqli_begin_transaction($conn, MYSQLI_TRANS_START_READ_WRITE);
+    $conn->beginTransaction();
 
-    $query_create_user = 'INSERT INTO user VALUES (NULL, ?, ?, ?);';
-    $stmt_create_user = mysqli_stmt_init($conn);
-    mysqli_stmt_prepare($stmt_create_user, $query_create_user);
-    mysqli_stmt_bind_param(
-        $stmt_create_user,
-        "sss",
-        $username,
-        $name,
-        $encrypted_pwd
-    );
-    mysqli_stmt_execute($stmt_create_user);
-
-    //Get last id on database
-    $userID = mysqli_insert_id($conn);
+    $stmt_create_user = $conn->prepare('INSERT INTO user (username, name, pwd) VALUES (:username, :name, :password)');
+    $stmt_create_user->bindParam(":username", $username);
+    $stmt_create_user->bindParam(":name", $name);
+    $stmt_create_user->bindParam(":password", $encrypted_pwd);
+    $stmt_create_user->execute();
+    $userID = $conn->lastInsertId();
     
-    $stmt_get_user = mysqli_stmt_init($conn);
-    $query_get_user = "SELECT * FROM user 
-                       WHERE username = ?";
-    mysqli_stmt_prepare($stmt_get_user, $query_get_user);
-    mysqli_stmt_bind_param(
-        $stmt_get_user,
-        "s",
-        $username
-    );
-    mysqli_stmt_execute($stmt_get_user);
-
-    $user_result = mysqli_stmt_get_result($stmt_get_user);
-    $user_result = mysqli_fetch_all($user_result, MYSQLI_ASSOC); 
+    $stmt_get_user = $conn->prepare("SELECT * FROM user WHERE username = :username");
+    $stmt_get_user->bindParam(":username", $username);
+    $stmt_get_user->execute();
+    $user_result = $stmt_get_users->fetchAll(PDO::FETCH_ASSOC);
     $user = $user_result[0];
 
-    mysqli_commit($conn);
-
-    mysqli_stmt_close($stmt_create_user);
-    mysqli_stmt_close($stmt_get_user);
-    mysqli_close($conn);
+    $conn->commit();
 
     $_SESSION['user_username'] = $user['username'];
     $_SESSION['user_name'] = $user['name'];
@@ -98,9 +72,8 @@ try {
     $_SESSION['is_logged'] = true;
     header('Location: '.'../index.php');
 
-} catch (Exception $e) {
-    mysqli_rollback($conn);
+} catch (PDOException  $e) {
+    $conn->rollBack();
     echo "Error al hacer registro: ".$e->getMessage();
-    mysqli_close($conn);
-    header("location: ../index.php");
+    //header("location: ../index.php");
 }

@@ -27,33 +27,21 @@ if ($fields_errors) {
 
 // Login process
 
-$username = mysqli_escape_string($conn, $fields['username']['value']);
-$pwd = mysqli_escape_string($conn, $fields['pwd']['value']);
-
 try {
-    $query_get_users = "SELECT * FROM user WHERE username = ?";
-    $stmt_get_users = mysqli_stmt_init($conn);
-    mysqli_stmt_prepare($stmt_get_users, $query_get_users);
-    mysqli_stmt_bind_param($stmt_get_users, "s", $username);
-    mysqli_stmt_execute($stmt_get_users);
+    $stmt_get_users = $conn -> prepare("SELECT * FROM user WHERE username = :username");
+    $stmt_get_users -> bindParam(":username", $fields['username']['value']);
+    $stmt_get_users->execute();
 
-    $users_result = mysqli_stmt_get_result($stmt_get_users);
+    $user = $stmt_get_users->fetch(PDO :: FETCH_ASSOC);
 
-    if (mysqli_num_rows($users_result) == 0) {
+    if (!$user) {
         header('Location: ../view/login.php?error=invalid_login');
         exit();
     }
-
-    $users_result = mysqli_fetch_all($users_result, MYSQLI_ASSOC); 
-    $user = $users_result[0];
-
-    if (!password_verify($pwd, $user['pwd'])) {
+    if (!password_verify($fields['pwd']['value'], $user['pwd'])) {
         header('Location: ../view/login.php?error=invalid_login');
         exit();
     }
-
-    mysqli_stmt_close($stmt_get_users);
-    mysqli_close($conn);
 
     $_SESSION['user_username'] = $user['username'];
     $_SESSION['user_name'] = $user['name'];
@@ -61,8 +49,7 @@ try {
     $_SESSION['is_logged'] = true;
     header('Location: '.'../index.php');
 
-} catch (Exception $e) {
+} catch (PDOException $e) {
     echo "Error al hacer login: ".$e->getMessage();
-    mysqli_close($conn);
     header("location: ../index.php");
 }

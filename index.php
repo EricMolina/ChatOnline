@@ -8,7 +8,7 @@ session_start();
 check_user_login("./view/login.php");
 
 $logged_user = get_user_logedin();
-$logged_user_id = mysqli_escape_string($conn, $logged_user["id"]);
+$logged_user_id = $logged_user["id"];
 
 ?>
 
@@ -92,9 +92,9 @@ $logged_user_id = mysqli_escape_string($conn, $logged_user["id"]);
                     <div class="column column-1 chatonline-chat-chat-header">
                         <div class="row">
                             <div class="column column-2">
-                                <img src="./img/user.png" alt="" style="float: left; width: 7vh; heigth: auto;">
+                                <img src="./img/user.png" alt="" style="float: left; width: 6vh; heigth: auto;">
                                 <span>
-                                    <h2 id="current_contact_username" style='padding-left: 18%; padding-top: 2%; color: white;'></h2>
+                                    <h2 id="current_contact_username" style='padding-left: 18%; padding-top: 0.5%; color: white;'></h2>
                                 </span>
                             </div>
                             <div class="column column-40"></div>
@@ -115,7 +115,7 @@ $logged_user_id = mysqli_escape_string($conn, $logged_user["id"]);
 
                             <label id="msg_file_info" for="msg_file"><img src="./img/file.svg" id="msg_file_icon"
                                     class="chatonline-svg-white" /></label>
-                            <input type="file" name="msg_files[]" id="msg_file" multiple accept="image/,video/" onchange="validateFileCount()">
+                            <input type="file" name="msg_files[]" id="msg_file" multiple accept="image/*,video/*" onchange="validateFileCount()">
                             <input type="hidden" name="MAX_FILE_SIZE" value="<?php echo (2 * 1024 * 1024); ?>">
 
                             <input id="msg-content" oninput="CheckChatText();" type="text" name="msg"

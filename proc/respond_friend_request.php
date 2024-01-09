@@ -17,79 +17,48 @@ if ((!isset($_GET['response']) || empty($_GET['response'])) ||
 }
 
 $request_response = $_GET['response'];
-$request_id = mysqli_escape_string($conn, $_GET['request_id']);
+$request_id = $_GET['request_id'];
 
 try {
-    mysqli_autocommit($conn, false);
-    mysqli_begin_transaction($conn, MYSQLI_TRANS_START_READ_WRITE);
+    $conn->beginTransaction();
 
     if ($request_response == 'accept') {
         // Get friend request
-        $query_get_friend_request = "SELECT * FROM friend_request
-                                     WHERE id = ?;";
-    
-        $stmt_get_friend_request = mysqli_stmt_init($conn);
-        mysqli_stmt_prepare($stmt_get_friend_request, $query_get_friend_request);
-        mysqli_stmt_bind_param(
-            $stmt_get_friend_request,
-            "i",
-            $request_id,
-        );
-        mysqli_stmt_execute($stmt_get_friend_request);
+        $query_get_friend_request = "SELECT * FROM friend_request WHERE id = :id;";
+        $stmt_get_friend_request = $conn->prepare($query_get_friend_request);
+        $stmt_get_friend_request->bindParam(":id", $request_id);
+        $stmt_get_friend_request->execute();
         
-        $friend_request_result = mysqli_stmt_get_result($stmt_get_friend_request);
+        $friend_request_result = $stmt_get_friend_request->fetchAll(PDO::FETCH_ASSOC);
 
-        if (mysqli_num_rows($friend_request_result) == 0) {
+        if (count($friend_request_result) == 0) {
             header('Location: ../index.php');
             exit();
         }
 
-        $friend_request = mysqli_fetch_all($friend_request_result, MYSQLI_ASSOC);
-
-        mysqli_stmt_close($stmt_get_friend_request);
-
-        $id_friend_request_sender = $friend_request[0]['id_user_sender'];
-        $id_friend_request_receiver = $friend_request[0]['id_user_receiver'];
+        $id_friend_request_sender = $friend_request_result[0]['id_user_sender'];
+        $id_friend_request_receiver = $friend_request_result[0]['id_user_receiver'];
 
         // Create friend ship
-
-        $query_create_friend_ship = 'INSERT INTO friend_ship VALUES (NULL, ?, ?);';
-        $stmt_create_friend_ship = mysqli_stmt_init($conn);
-        mysqli_stmt_prepare($stmt_create_friend_ship, $query_create_friend_ship);
-        mysqli_stmt_bind_param(
-            $stmt_create_friend_ship,
-            "ii",
-            $id_friend_request_sender,
-            $id_friend_request_receiver
-        );
-        mysqli_stmt_execute($stmt_create_friend_ship);
+        $query_create_friend_ship = 'INSERT INTO friend_ship VALUES (NULL, :sender, :receiver);';
+        $stmt_create_friend_ship = $conn->prepare($query_create_friend_ship);
+        $stmt_create_friend_ship->bindParam(":sender", $id_friend_request_sender);
+        $stmt_create_friend_ship->bindParam(":receiver", $id_friend_request_receiver);
+        $stmt_create_friend_ship->execute();
     }
 
     //Delete friend request
+    $query_delete_friend_request = 'DELETE FROM friend_request where id = :id;';
+    $stmt_delete_friend_request = $conn->prepare($query_delete_friend_request);
+    $stmt_delete_friend_request->bindParam(":id", $request_id);
+    $stmt_delete_friend_request->execute();
 
-    $query_delete_friend_request = 'DELETE FROM friend_request where id = ?;';
-    $stmt_delete_friend_request = mysqli_stmt_init($conn);
-    mysqli_stmt_prepare($stmt_delete_friend_request, $query_delete_friend_request);
-    mysqli_stmt_bind_param(
-        $stmt_delete_friend_request,
-        "i",
-        $request_id
-    );
-    mysqli_stmt_execute($stmt_delete_friend_request);
-
-    mysqli_commit($conn);
-
-    mysqli_stmt_close($stmt_delete_friend_request);
-    if ($request_response == 'accept') {
-        mysqli_stmt_close($stmt_create_friend_ship);
-    }
-    mysqli_close($conn);
+    $conn->commit();
 
     header('Location: ../index.php?window=requests'.$searched_user);
 
-} catch (Exception $e) {
-    mysqli_rollback($conn);
+} catch (PDOException $e) {
+    $conn->rollBack();
     echo "Error al enviar petición de amistad: ".$e->getMessage();
-    mysqli_close($conn);
     header("location: ../index.php");
 }
