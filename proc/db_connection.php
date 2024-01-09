@@ -4,7 +4,7 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 $db_server = "localhost";
 $db_username = "root";
-$db_password = "";
+$db_password = "asdASD123";
 $db_database = "db_chatonline";
 
 try {

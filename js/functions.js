@@ -10,8 +10,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 selectedOption = document.getElementsByClassName("chatonline-contacts-toggler-div-requests")[0];
             }
         }
-        selectedOption.style.backgroundColor = '#777777';
-        selectedOption.style.boxShadow = "inset 0px 0px 10px rgba(0, 0, 0, 0.5)";
 
         if (document.getElementById("contact_id") != null) {
             document.getElementsByClassName("chatonline-chat-chat")[0].style.display = "flex";
@@ -59,5 +57,43 @@ function CheckChatText() {
         document.getElementsByClassName("chatonline-chat-chat-footer-submit")[0].disabled = true;
     } else {
         document.getElementsByClassName("chatonline-chat-chat-footer-submit")[0].disabled = false;
+    }
+}
+
+function validateFileCount() {
+    var fileInput = document.getElementById('msg_file');
+    var filePreviews = document.getElementById("_chatonline-chat-chat-footer-images");
+    if (fileInput.files.length > 8) {
+        fileInput.value = ''; // Resetear el input
+        filePreviews.innerHTML = "";
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            }
+          });
+          Toast.fire({
+            icon: "error",
+            title: "No puedes subir más de 8 archivos"
+          });
+    } else {
+        filePreviews.innerHTML = "";
+        Array.from(fileInput.files).forEach(file => { 
+            var reader = new FileReader();
+            reader.onload = function (e) {
+
+                if (file.type.match('image.*')) {
+                    filePreviews.innerHTML += '<img class="chatonline-chat-chat-footer-image" src="' + e.target.result + '">';
+                } else if (file.type.match('video.*')) {
+                    filePreviews.innerHTML += '<video class="chatonline-chat-chat-footer-image"><source src="' + e.target.result + '"></video>';
+                }
+            };
+            reader.readAsDataURL(file);
+        });
     }
 }

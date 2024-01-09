@@ -27,13 +27,15 @@ CREATE TABLE `friend_ship` (
   FOREIGN KEY (`id_user2`) REFERENCES `user`(`id`)
 );
 
-CREATE TABLE `message` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `content` LONGTEXT NULL,
-  `date` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  `id_friendship` INT NULL,
-  `id_user_sender` INT NULL,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`id_friendship`) REFERENCES `friend_ship`(`id`),
-  FOREIGN KEY (`id_user_sender`) REFERENCES `user`(`id`)
+
+CREATE TABLE message (
+  id INT NOT NULL AUTO_INCREMENT,
+  content LONGTEXT NULL,
+  image LONGTEXT NULL,
+  date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  id_friendship INT NULL,
+  id_user_sender INT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (id_friendship) REFERENCES friend_ship(id),
+  FOREIGN KEY (id_user_sender) REFERENCES user(id)
 );

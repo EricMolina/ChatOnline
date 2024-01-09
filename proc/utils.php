@@ -57,5 +57,3 @@ function get_user_logedin() {
     ];
     return $logged_user;
 }
-
-?>
