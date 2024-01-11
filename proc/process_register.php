@@ -61,14 +61,12 @@ try {
     $stmt_get_user = $conn->prepare("SELECT * FROM user WHERE username = :username");
     $stmt_get_user->bindParam(":username", $username);
     $stmt_get_user->execute();
-    $user_result = $stmt_get_users->fetchAll(PDO::FETCH_ASSOC);
-    $user = $user_result[0];
+    $user_result = $stmt_get_user->fetchAll(PDO::FETCH_ASSOC);
 
     $conn->commit();
-
-    $_SESSION['user_username'] = $user['username'];
-    $_SESSION['user_name'] = $user['name'];
-    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['user_username'] = $user_result[0]['username'];
+    $_SESSION['user_name'] = $user_result[0]['name'];
+    $_SESSION['user_id'] = $user_result[0]['id'];
     $_SESSION['is_logged'] = true;
     header('Location: '.'../index.php');
 

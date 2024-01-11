@@ -11,8 +11,8 @@ function loadContacts() {
 
         data.forEach(contact => {
             if (contact.last_message_content) {
-                lastMessageContent = contact.last_message_content.length <= 15 ? 
-                                        contact.last_message_content : contact.last_message_content.substring(0, 15) + "...";
+                lastMessageContent = contact.last_message_content.length <= 15 ?
+                    contact.last_message_content : contact.last_message_content.substring(0, 15) + "...";
             } else {
                 lastMessageContent = '';
             }
@@ -34,7 +34,7 @@ function loadContacts() {
                 </div>`;
         });
     }
-    
+
     ajax.send()
 }
 
@@ -81,14 +81,14 @@ function loadSearchedUsers() {
             } else {
                 userContent += `
                     <p class="chatonline-contacts-contact-request-text">Send request</p>
-                ` 
+                `
             }
-            
+
             userContent += `
                 </div>
                     <div class="column column-5 chatonline-contacts-contact-hide-column">
             `;
-            
+
             if (user.is_friend) {
                 userContent += `
                     <img src="./img/user_del.png" alt="logo" class="chatonline-contacts-contact-request-button">
@@ -100,9 +100,9 @@ function loadSearchedUsers() {
             } else {
                 userContent += `
                     <img src="./img/user_add.png" alt="logo" class="chatonline-contacts-contact-request-button">
-                ` 
+                `
             }
-            
+
             userContent += `
                     </div>
                 </div>
@@ -145,7 +145,7 @@ function loadFriendshipRequests() {
             </div>`;
         });
     }
-    
+
     ajax.send()
 }
 
@@ -167,7 +167,7 @@ function loadContactMessages(contactId) {
             let messageSender = message.id_user_sender == loggedUserId ? 'msg-sent' : 'msg-received';
 
             messageContent = `<div class="chatonline-chat-chat-content-message ${messageSender}">`;
-            
+
             if (message.image && message.image != "") {
                 let a = message.image.split('.');
                 let extension = a[a.length - 1];
@@ -180,7 +180,7 @@ function loadContactMessages(contactId) {
                     </video> `;
                 }
             }
-            
+
             messageContent += `
                 <span class="chatonline-chat-chat-message-text">
                     ${message.content}
@@ -191,12 +191,45 @@ function loadContactMessages(contactId) {
             </div>`;
 
             messagesContainer.innerHTML += messageContent;
+
+            lastMsgID = message.id;
         });
 
+        actualFriendshipID = data.contact_friendship_id;
+        actualContactID = contactId;
+
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        CheckActualMessages();
     }
 
     ajax.send()
+}
+
+let lastMsgID = 0;
+let actualFriendshipID = 0;
+let actualContactID = 0;
+let checkLastMessageLoop;
+function CheckActualMessages() {
+    clearInterval(checkLastMessageLoop);
+
+    checkLastMessageLoop = setInterval(() => {
+        var ajax = new XMLHttpRequest();
+        var formData = new FormData();
+        formData.append("id_friendship", actualFriendshipID)
+        ajax.open("POST", "./proc/check_last_message.php");
+
+        ajax.onload = function () {
+            if (ajax.status == 200) {
+                if (lastMsgID != parseInt(ajax.responseText)) {
+                    console.log("mensaje diferente: " + lastMsgID + " - " + ajax.responseText + " - " + actualFriendshipID);
+                    loadContactMessages(actualContactID);
+                } else {
+                    console.log("mensaje igual: " + lastMsgID + " - " + ajax.responseText + " - " + actualFriendshipID);
+                }
+            }
+        }
+        ajax.send(formData);
+    }, 500);
 }
 
 
@@ -319,8 +352,8 @@ window.onload = () => {
     })
 
 
-/*     setInterval(() => {
-        loadContactMessages(22)
-    }, 100) */
+    /*     setInterval(() => {
+            loadContactMessages(22)
+        }, 100) */
 }
 

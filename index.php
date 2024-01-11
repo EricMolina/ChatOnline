@@ -98,10 +98,6 @@ $logged_user_id = $logged_user["id"];
                                 </span>
                             </div>
                             <div class="column column-40"></div>
-                            <div class="column column-10">
-                                <img onclick="location.reload()" src="./img/reload.png" alt=""
-                                    class="chatonline-chat-reload">
-                            </div>
                         </div>
                     </div>
                     <div id="chatonline-messages-container" class="column column-1 chatonline-chat-chat-content">
