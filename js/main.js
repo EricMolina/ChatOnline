@@ -182,8 +182,7 @@ function loadContactMessages(contactId) {
             }
 
             messageContent += `
-                <span class="chatonline-chat-chat-message-text">
-                    ${message.content}
+                <span id='message-${message.id}' class="chatonline-chat-chat-message-text">
                 </span>
                 <span class="chatonline-chat-chat-timestamp">
                     ${message.message_datetime}
@@ -191,6 +190,8 @@ function loadContactMessages(contactId) {
             </div>`;
 
             messagesContainer.innerHTML += messageContent;
+
+            document.getElementById(`message-${message.id}`).innerText = message.content;
 
             lastMsgID = message.id;
         });
