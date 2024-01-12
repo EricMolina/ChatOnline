@@ -480,6 +480,12 @@ span {
     padding-bottom: 25px;
 }
 
+.chatonline-chat-chat-content-message-removable:hover {
+    filter: brightness(0.8);
+    background-color: rgb(186, 0, 0);
+    cursor: pointer;
+}
+
 .chatonline-chat-chat-content-image {
     max-width: 100%;
     height: auto;

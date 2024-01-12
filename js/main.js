@@ -150,7 +150,7 @@ function loadFriendshipRequests() {
 }
 
 
-function loadContactMessages(contactId) {
+function loadContactMessages(contactId, goDown) {
     let ajax = new XMLHttpRequest();
     ajax.open('GET', `./proc/load_contact_messages.php?contact=${contactId}`);
 
@@ -163,10 +163,17 @@ function loadContactMessages(contactId) {
         document.getElementById('current_contact_username').textContent = data.contact_username;
         document.getElementById('contact_friend_ship').value = data.contact_friendship_id;
 
+        totalMsgs = 0;
         data.contact_messages.forEach(message => {
             let messageSender = message.id_user_sender == loggedUserId ? 'msg-sent' : 'msg-received';
 
-            messageContent = `<div class="chatonline-chat-chat-content-message ${messageSender}">`;
+            messageContent = `<div class='chatonline-chat-chat-content-message ${messageSender} `;
+            if (message.removable == "true" && message.id_user_sender != contactId) {
+                messageContent += "chatonline-chat-chat-content-message-removable";
+                messageContent += '\'onclick="RemoveMessage(' + message.id + ')">';
+            } else {
+                messageContent += "'>";
+            }
 
             if (message.image && message.image != "") {
                 let a = message.image.split('.');
@@ -193,20 +200,21 @@ function loadContactMessages(contactId) {
 
             document.getElementById(`message-${message.id}`).innerText = message.content;
 
-            lastMsgID = message.id;
+            totalMsgs++;
         });
 
         actualFriendshipID = data.contact_friendship_id;
         actualContactID = contactId;
 
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        if (goDown)
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         CheckActualMessages();
     }
 
     ajax.send()
 }
 
-let lastMsgID = 0;
+let totalMsgs = 0;
 let actualFriendshipID = 0;
 let actualContactID = 0;
 let checkLastMessageLoop;
@@ -221,11 +229,11 @@ function CheckActualMessages() {
 
         ajax.onload = function () {
             if (ajax.status == 200) {
-                if (lastMsgID != parseInt(ajax.responseText)) {
-                    console.log("mensaje diferente: " + lastMsgID + " - " + ajax.responseText + " - " + actualFriendshipID);
-                    loadContactMessages(actualContactID);
+                if (totalMsgs != parseInt(ajax.responseText)) {
+                    console.log("mensajes: " + totalMsgs + " - " + ajax.responseText + " - " + actualFriendshipID);
+                    loadContactMessages(actualContactID, true);
                 } else {
-                    console.log("mensaje igual: " + lastMsgID + " - " + ajax.responseText + " - " + actualFriendshipID);
+                    console.log("mensajes iguales: " + totalMsgs + " - " + ajax.responseText + " - " + actualFriendshipID);
                 }
             }
         }
@@ -278,7 +286,7 @@ function sendMessage() {
     var formdata = new FormData(form);
 
     ajax.onload = () => {
-        loadContactMessages(formdata.get('contact'));
+        loadContactMessages(formdata.get('contact'), true);
         loadContacts();
         document.getElementById('msg-content').value = '';
         document.getElementById('msg_file').value = '';
@@ -294,7 +302,7 @@ function sendMessage() {
 function changeCurrentContact(contactId) {
     document.getElementById('contact_field_send_msg').value = contactId;
     displayChatLayout()
-    loadContactMessages(contactId)
+    loadContactMessages(contactId, true)
 }
 
 
@@ -315,6 +323,38 @@ function toggleSelectedTab(e) {
 function displayChatLayout() {
     document.getElementsByClassName("chatonline-chat-chat")[0].style.display = "flex";
     document.getElementsByClassName("chatonline-chat-nochat")[0].style.display = "none";
+}
+
+function RemoveMessage(messageId) {
+    
+    Swal.fire({
+        title: "¿Quieres borrar el mensaje?",
+        showDenyButton: true,
+        confirmButtonText: "Cancelar",
+        denyButtonText: `Borrar`
+    }).then((result) => {
+        if (result.isConfirmed) {
+            //No delete
+        } else if (result.isDenied) {
+
+            var ajax = new XMLHttpRequest();
+            var formData = new FormData();
+            formData.append("message_id", messageId);
+
+            ajax.open('POST', `./proc/delete_message.php`);
+
+            ajax.onload = () => {
+                if (ajax.status == 200 && ajax.responseText == "ok") {
+                    Swal.fire("Mensaje borrado.", "", "success");
+                    loadContactMessages(actualContactID, false);
+                } else {
+                    Swal.fire("Algo ha fallado.", "", "error");
+                }
+            }
+            ajax.send(formData);
+
+        }
+    });
 }
 
 
@@ -351,10 +391,5 @@ window.onload = () => {
             sendMessage();
         }
     })
-
-
-    /*     setInterval(() => {
-            loadContactMessages(22)
-        }, 100) */
 }
 

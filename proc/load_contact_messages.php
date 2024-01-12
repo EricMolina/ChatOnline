@@ -40,9 +40,10 @@ $contact_username = $contact_friend_ship_result[0]['contact_username'];
 
 // Get contact messages
 
-$query_get_contact_messages = "SELECT *, DATE_FORMAT(message.date, '%Y/%m/%d %H:%i') as 'message_datetime'
-                                    FROM db_chatonline.message
-                                    WHERE id_friendship = :a;";
+$query_get_contact_messages = "SELECT *, DATE_FORMAT(message.date, '%Y/%m/%d %H:%i') as 'message_datetime',
+                                IF(date_add(message.date, interval 10 minute) > now(), 'true', 'false') as removable
+                                FROM db_chatonline.message
+                                WHERE id_friendship = :a;";
 
 $stmt_get_contact_messages = $conn->prepare($query_get_contact_messages);
 $stmt_get_contact_messages->bindParam(":a", $contact_friend_ship_id);
