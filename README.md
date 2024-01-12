@@ -6,6 +6,7 @@
 - Capacidad de insertar imagenes, gifs y vídeos
 - Chat actualizado en tiempo real
 - Envío de solicitudes de amistad dinámico
+- Borrar mensajes enviados hace menos de 10 minutos
 
 ### Usuarios disponibles para acceder:
 - asantos (Alberto De Santos): asdASD123
